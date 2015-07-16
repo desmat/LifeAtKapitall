@@ -1,0 +1,255 @@
+<html>
+<head>
+<title>Life at Kapitall</title>
+<meta charset="utf-8"/>
+<style>
+body {
+	margin: 0 0 0 0;
+}
+.outer {
+	width: 100%;
+	height: 100%;
+	position: relative;
+
+    /*background-color: red;*/
+}
+.quote-outer {
+	font-family: serif;
+	font-weight: normal;
+	font-size: 1em;
+
+	display: table;
+	margin-left: auto;
+	margin-right: auto;
+}
+.quote {
+	font-style: italic;
+
+	/*width: 100%;*/
+	text-align: center;
+
+    /*background-color: yellow;*/
+}
+.source {
+
+	/*width: 100%;*/
+	text-align: right;
+	margin-right: 5%;
+
+	white-space: nowrap;
+
+    /*background-color: red;*/
+}
+.main {
+	font-size: 6em;
+	font-family: monospace;
+	font-weight: bold;
+
+	position: absolute;
+	width: 100%;
+	top: 35%;
+	/*transform: translate(0, -50%);*/
+	/*-webkit-transform: translate(0, -50%);*/
+	text-align: center;
+
+    /*background-color: blue;*/
+}
+.footer {
+	font-size: 1.5em;
+	font-family: serif;
+	font-weight: normal;
+	font-style: italic;
+
+	position: absolute;
+	bottom: 1%;
+	right: 2%;
+
+    /*background-color: green;*/
+}
+.style0 {
+	background-color: rgb(132, 177, 71);
+	color: rgb(255, 255, 255);
+}
+.style1 {
+	color: #aaa;
+	background-color: #404142;
+}
+.style2 {
+	background-color: rgb(220, 87, 75);
+	color: rgb(255, 255, 255);
+}
+.style3 {
+	background-color: rgb(41, 164, 169);
+	color: rgb(255, 255, 255);
+}
+.touch {
+	/*transform: scale(1.5, 1.2) translate(0, -50%);*/
+	-webkit-transform: scale(1.2, 1.2) ;
+}
+@media only screen 
+and (min-width : 0px) {
+	.main {
+		font-size: 2em;
+	    /*background-color: blue;*/
+	}
+	.quote-outer {
+		font-size: 0.8em;
+	}	
+	.quote-outer {
+		font-size: 1em;
+	}	
+}
+@media only screen 
+and (min-width : 500px) {
+	.main {
+		font-size: 5em;
+	    /*background-color: red;*/
+	}
+	.quote-outer {
+		font-size: 1.5em;
+	}	
+	.footer {
+		font-size: 2em;
+	}	
+}
+@media only screen 
+and (min-width : 650px) {
+	.main {
+		font-size: 6em;
+	    /*background-color: yellow;*/
+	}
+	.quote-outer {
+		font-size: 2em;
+	}	
+	.footer {
+		font-size: 2.5em;
+	}	
+}
+@media only screen 
+and (min-width : 800px) {
+	.main {
+		font-size: 7em;
+	}
+	.quote-outer {
+		font-size: 2.5em;
+	}	
+	.footer {
+		font-size: 3em;
+	}	
+}
+@media only screen 
+and (min-width : 1000px) {
+	.main {
+		font-size: 9em;
+	}
+	.quote-outer {
+		font-size: 2em;
+	}	
+	.footer {
+		font-size: 2.5em;
+	}	
+}
+@media only screen 
+and (min-width : 1200px) {
+	.main {
+		font-size: 11em;
+	}
+	.quote-outer {
+		font-size: 3em;
+	}	
+	.footer {
+		font-size: 5em;
+	}	
+}
+</style>
+</head>
+<body>
+	<script>
+		var nextRandomButNotSameAsLast = function(setSize, last) {
+			while (true) {
+				var i = Math.floor(Math.random() * setSize);
+				if (i != last || setSize <= 1) {
+					return i;
+				}
+			}
+		}
+
+		var lastStyleIndex = -1;
+
+		var touchThing = function(documentId) {
+			document.getElementById('ohwell').setAttribute('class','main touch');
+		}
+
+		var untouchThing = function(documentId) {
+			var lastStyleIndex = nextRandomButNotSameAsLast(4, lastStyleIndex); 
+			document.getElementById('ohwell').setAttribute('class','main'); 
+			document.getElementById('outer').setAttribute('class', 'outer style' + lastStyleIndex)
+		}
+	</script>
+	<script>lastStyleIndex = nextRandomButNotSameAsLast(4, lastStyleIndex); document.write("<div id='outer' class='outer style" + lastStyleIndex + "'>");</script>		<div class="quote-outer"><div class='quote'/></div><div class='source'></div></div>
+	<div id='ohwell-outer'  onmousedown="touchThing();" ontouchstart="touchThing();" onmouseup="untouchThing()" ontouchend="untouchThing()">
+		<div id="ohwell" class='main'>¯\_(ツ)_/¯</div>
+	</div>
+	<div class='footer'>Life at Kapitall</div>
+</div>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script>
+	var quotes = [];
+
+	var lastQuoteIndex = -1;
+
+	var nextQuote = function() {
+		$('.quote-outer').fadeOut('fast', function() {
+
+			$.ajax({
+				url:'/api/quotes/count'
+				,dataType: 'json'
+				,success: function(result) {
+					console.log(result.count);
+
+					lastQuoteIndex = nextRandomButNotSameAsLast(result.count, lastQuoteIndex);
+
+					$.ajax({
+						url:'/api/quotes/' + (lastQuoteIndex + 1)
+						,dataType: 'json'
+						,success: function(result) {
+							$('.quote').text(result.quote);
+							$('.source').text('-' + result.source);
+							$('.quote-outer').fadeIn('slow', function() {  });
+						}
+					});
+
+				}
+			});
+		});
+	};
+
+	var timeoutNextQuote = function() {
+		nextQuote();
+		setTimeout(function() {
+			timeoutNextQuote();
+		}, 5000);
+	}
+
+	setTimeout(function() {	
+		timeoutNextQuote();
+	}, 1000);
+
+	// $.ajax({
+	// 	url:'/api/quotes'
+	// 	,dataType: 'json'
+	// 	,success: function(result) {
+	// 		//console.dir(result[0].quote);
+	// 		quotes = result;
+
+	// 		setTimeout(function() {	
+	// 			timeoutNextQuote();
+	// 		}, 1000);
+
+	// 	}
+
+
+	// });
+</script>
+</html>
