@@ -165,13 +165,15 @@ and (min-width : 1200px) {
 </head>
 <body>
 	<script>
-		var nextRandomButNotSameAsLast = function(setSize, last) {
-			while (true) {
-				var i = Math.floor(Math.random() * setSize);
-				if (i != last || setSize <= 1) {
-					return i;
+		var nextRandomButNotSameAsLast = function(set, last) {
+			while (set.length > 0) {
+				var i = Math.floor(Math.random() * set.length);
+				if (i != last) {
+					return set[i];
 				}
 			}
+
+			return set[0]
 		}
 
 		var lastStyleIndex = -1;
@@ -181,12 +183,12 @@ and (min-width : 1200px) {
 		}
 
 		var untouchThing = function(documentId) {
-			var lastStyleIndex = nextRandomButNotSameAsLast(4, lastStyleIndex); 
+			var lastStyleIndex = nextRandomButNotSameAsLast([0,1,2,3], lastStyleIndex); 
 			document.getElementById('ohwell').setAttribute('class','main'); 
 			document.getElementById('outer').setAttribute('class', 'outer style' + lastStyleIndex)
 		}
 	</script>
-	<script>lastStyleIndex = nextRandomButNotSameAsLast(4, lastStyleIndex); document.write("<div id='outer' class='outer style" + lastStyleIndex + "'>");</script>		<div class="quote-outer"><div class='quote'/></div><div class='source'></div></div>
+	<script>lastStyleIndex = nextRandomButNotSameAsLast([0,1,2,3], lastStyleIndex); document.write("<div id='outer' class='outer style" + lastStyleIndex + "'>");</script>		<div class="quote-outer"><div class='quote'/></div><div class='source'></div></div>
 	<div id='ohwell-outer'  onmousedown="touchThing();" ontouchstart="touchThing();" onmouseup="untouchThing()" ontouchend="untouchThing()">
 		<div id="ohwell" class='main'>¯\_(ツ)_/¯</div>
 	</div>
@@ -203,15 +205,15 @@ and (min-width : 1200px) {
 		$('.quote-outer').fadeOut('fast', function() {
 
 			$.ajax({
-				url:'/api/quotes/count'
+				url:'/api/quotes/ids'
 				,dataType: 'json'
 				,success: function(result) {
-					console.log(result.count);
+					console.log(result.ids.count);
 
-					lastQuoteIndex = nextRandomButNotSameAsLast(result.count, lastQuoteIndex);
+					lastQuoteIndex = nextRandomButNotSameAsLast(result.ids, lastQuoteIndex);
 
 					$.ajax({
-						url:'/api/quotes/' + (lastQuoteIndex + 1)
+						url:'/api/quotes/' + lastQuoteIndex
 						,dataType: 'json'
 						,success: function(result) {
 							$('.quote').text(result.quote);
